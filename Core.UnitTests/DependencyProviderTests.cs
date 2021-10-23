@@ -1,11 +1,10 @@
-﻿using DependencyInjectionContainer;
-using NUnit.Framework;
+﻿using Core;
 using System;
+using Xunit;
 
-namespace CoreTests
+namespace CoreFacts
 {
-    [TestFixture]
-    public class DependencyProviderTests
+    public class DependencyProviderFacts
     {
         interface ISomeObj
         {
@@ -35,8 +34,8 @@ namespace CoreTests
 
         class GenericImpl2 : IGenericObj<ISomeObj>
         {
-            private int _Value = new Random().Next();
-            public int Value => _Value;
+            private int _value = new Random().Next();
+            public int Value => _value;
 
             private ISomeObj _obj;
             public ISomeObj TObj => _obj;
@@ -44,14 +43,14 @@ namespace CoreTests
 
         class ObjImpl : ISomeObj
         {
-            private int _Value = new Random().Next();
-            public int Value => _Value;
+            private int _value = new Random().Next();
+            public int Value => _value;
         }
 
         class AgregateObj : IAgregateObj
         {
-            private int _Value = new Random().Next();
-            public int Value => _Value;
+            private int _value = new Random().Next();
+            public int Value => _value;
 
 
             private ISomeObj _obj;
@@ -63,39 +62,33 @@ namespace CoreTests
             }
         }
 
-        [Test]
+        [Fact]
         public void Resolve_DifferentValues_Instance()
         {
             var provider = new DependencyProvider();
             provider.Register<ISomeObj, ObjImpl>(Lifetime.Instance);
             int inst1 = provider.Resolve<ISomeObj>().Value;
-            Assert.Multiple(() =>
+            for (int i = 0; i < 100; i++)
             {
-                for (int i = 0; i < 100; i++)
-                {
-                    int inst2 = provider.Resolve<ISomeObj>().Value;
-                    Assert.AreNotEqual(inst1, inst2);
-                }
-            });
+                int inst2 = provider.Resolve<ISomeObj>().Value;
+                Assert.NotEqual(inst1, inst2);
+            }
         }
 
-        [Test]
+        [Fact]
         public void Resolve_SameValues_Singleton()
         {
             var provider = new DependencyProvider();
             provider.Register<ISomeObj, ObjImpl>(Lifetime.Singleton);
             int inst1 = provider.Resolve<ISomeObj>().Value;
-            Assert.Multiple(() =>
+            for (int i = 0; i < 100; i++)
             {
-                for (int i = 0; i < 100; i++)
-                {
-                    int inst2 = provider.Resolve<ISomeObj>().Value;
-                    Assert.AreEqual(inst1, inst2);
-                }
-            });
+                int inst2 = provider.Resolve<ISomeObj>().Value;
+                Assert.Equal(inst1, inst2);
+            }
         }
 
-        [Test]
+        [Fact]
         public void Resolve_Instance_Instance()
         {
             var provider = new DependencyProvider();
@@ -103,18 +96,15 @@ namespace CoreTests
             provider.Register<IAgregateObj, AgregateObj>(Lifetime.Instance);
 
             IAgregateObj inst1 = provider.Resolve<IAgregateObj>();
-            Assert.Multiple(() =>
+            for (int i = 0; i < 100; i++)
             {
-                for (int i = 0; i < 100; i++)
-                {
-                    IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
-                    Assert.AreNotEqual(inst1.Value, inst2.Value);
-                    Assert.AreNotEqual(inst1.Obj.Value, inst2.Obj.Value);
-                }
-            });
+                IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
+                Assert.NotEqual(inst1.Value, inst2.Value);
+                Assert.NotEqual(inst1.Obj.Value, inst2.Obj.Value);
+            }
         }
 
-        [Test]
+        [Fact]
         public void Resolve_Instance_Singleton()
         {
             var provider = new DependencyProvider();
@@ -122,20 +112,17 @@ namespace CoreTests
             provider.Register<IAgregateObj, AgregateObj>(Lifetime.Singleton);
             int val1 = provider.Resolve<ISomeObj>().Value;
             IAgregateObj inst1 = provider.Resolve<IAgregateObj>();
-            Assert.Multiple(() =>
+            for (int i = 0; i < 100; i++)
             {
-                for (int i = 0; i < 100; i++)
-                {
-                    int val2 = provider.Resolve<ISomeObj>().Value;
-                    IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
-                    Assert.AreNotEqual(val1, val2);
-                    Assert.AreEqual(inst1.Value, inst2.Value);
-                    Assert.AreEqual(inst1.Obj.Value, inst2.Obj.Value);
-                }
-            });
+                int val2 = provider.Resolve<ISomeObj>().Value;
+                IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
+                Assert.NotEqual(val1, val2);
+                Assert.Equal(inst1.Value, inst2.Value);
+                Assert.Equal(inst1.Obj.Value, inst2.Obj.Value);
+            }
         }
 
-        [Test]
+        [Fact]
         public void Resolve_Singleton_Instance()
         {
             var provider = new DependencyProvider();
@@ -143,20 +130,17 @@ namespace CoreTests
             provider.Register<IAgregateObj, AgregateObj>(Lifetime.Instance);
             int val1 = provider.Resolve<ISomeObj>().Value;
             IAgregateObj inst1 = provider.Resolve<IAgregateObj>();
-            Assert.Multiple(() =>
+            for (int i = 0; i < 100; i++)
             {
-                for (int i = 0; i < 100; i++)
-                {
-                    int val2 = provider.Resolve<ISomeObj>().Value;
-                    IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
-                    Assert.AreEqual(val1, val2);
-                    Assert.AreNotEqual(inst1.Value, inst2.Value);
-                    Assert.AreEqual(inst1.Obj.Value, inst2.Obj.Value);
-                }
-            });
+                int val2 = provider.Resolve<ISomeObj>().Value;
+                IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
+                Assert.Equal(val1, val2);
+                Assert.NotEqual(inst1.Value, inst2.Value);
+                Assert.Equal(inst1.Obj.Value, inst2.Obj.Value);
+            }
         }
 
-        [Test]
+        [Fact]
         public void Resolve_Singleton_Singleton()
         {
             var provider = new DependencyProvider();
@@ -165,17 +149,14 @@ namespace CoreTests
             provider.Register<IAgregateObj, AgregateObj>(Lifetime.Singleton);
             int val1 = provider.Resolve<ISomeObj>().Value;
             IAgregateObj inst1 = provider.Resolve<IAgregateObj>();
-            Assert.Multiple(() =>
+            for (int i = 0; i < 100; i++)
             {
-                for (int i = 0; i < 100; i++)
-                {
-                    int val2 = provider.Resolve<ISomeObj>().Value;
-                    IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
-                    Assert.AreEqual(val1, val2);
-                    Assert.AreEqual(inst1.Value, inst2.Value);
-                    Assert.AreEqual(inst1.Obj.Value, inst2.Obj.Value);
-                }
-            });
+                int val2 = provider.Resolve<ISomeObj>().Value;
+                IAgregateObj inst2 = provider.Resolve<IAgregateObj>();
+                Assert.Equal(val1, val2);
+                Assert.Equal(inst1.Value, inst2.Value);
+                Assert.Equal(inst1.Obj.Value, inst2.Obj.Value);
+            }
         }
     }
 }

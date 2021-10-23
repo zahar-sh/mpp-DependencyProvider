@@ -1,4 +1,4 @@
-﻿namespace DependencyInjectionContainer
+﻿namespace Core
 {
     public enum Lifetime
     {
